@@ -19,7 +19,7 @@ In Docker-compose.yml:
 - 'POSTGRES_MULTIPLE_DATABASES': Create multiple databases.
 
 ## URL
-- traefik.app.localhost
-- 
+All url works by default in Google Chrome. For other tools, you should create url in your host files.
+- https://traefik.app.localhost
 
 Finish.
