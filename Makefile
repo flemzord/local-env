@@ -13,9 +13,9 @@ help: ## This help.
 
 .PHONY: start-all
 .DEFAULT_GOAL := help
-COMPOSE_FILE_PATH := -f docker-compose.yml -f $(shell find ./repos -type f -name "docker-compose.yml" -exec echo {} + | sed -e "s/ / -f /g")
+COMPOSE_FILE_PATH := -f docker-compose.yml -f $(shell find ./repos -maxdepth 2 -type f -name "docker-compose.yml" -exec echo {} + | sed -e "s/ / -f /g")
 
-install: mkcert certificate clone start-all
+install: mkcert certificate clone start-all app
 	@echo "All is OK"
 mkcert:
 	@mkcert -install
@@ -23,6 +23,10 @@ certificate:
 	@if [ ! -d "certs/local-cert.pem" ]; then mkcert -cert-file certs/local-cert.pem -key-file certs/local-key.pem "*.app.localhost"; fi
 clone:
 	@if [ ! -d "repos/example" ]; then git clone git@github.com:flemzord/local-env-laravel.git repos/example; fi
+app:
+	@$(DOCKER_CMD) $(COMPOSE_FILE_PATH) exec example composer install
+	@$(DOCKER_CMD) $(COMPOSE_FILE_PATH) exec example cp .env.example .env
+	@$(DOCKER_CMD) $(COMPOSE_FILE_PATH) exec example php artisan key:generate
 start-all: ## Start the container
 	@$(DOCKER_CMD) $(COMPOSE_FILE_PATH) up -d --remove-orphans
 build-all: ## Build the container
