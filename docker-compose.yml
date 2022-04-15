@@ -1,0 +1,51 @@
+volumes:
+  postgres:
+  opensearch:
+services:
+  traefik:
+    image: traefik:v2.5.3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik=true"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - ./config/traefik/dynamic_conf.yaml:/etc/traefik/dynamic_conf.yaml:ro
+      - ./config/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - ./certs:/etc/certs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: $DATABASE_USER
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
+      POSTGRES_MULTIPLE_DATABASES: api,api-partner
+      PGDATA: /data/postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U app" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres:/data/postgres
+      - ./config/postgres:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    expose:
+      - 6379
