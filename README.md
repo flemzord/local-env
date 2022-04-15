@@ -15,6 +15,9 @@ You need to install a few things:
 In Makefile:
 - ``clone``: Add one line to clone the repo.
 
+In Docker-compose.yml:
+- 'POSTGRES_MULTIPLE_DATABASES': Create multiple databases.
+
 ## URL
 - traefik.app.localhost
 - 
