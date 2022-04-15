@@ -14,6 +14,7 @@ You need to install a few things:
 ### Customizations
 In Makefile:
 - ``clone``: Add one line to clone the repo.
+- ``app``: One line by command for init service
 
 In Docker-compose.yml:
 - 'POSTGRES_MULTIPLE_DATABASES': Create multiple databases.
